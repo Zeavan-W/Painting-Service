@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painting - Your Home Expert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="container nav">
+      <div class="logo">Painting</div>
+      <nav>
+        <!--<a href="#">Home</a>
+        <a href="#">About Us</a>
+        <a href="#">Services</a>
+        <a href="#">Projects</a>
+        <a href="#">Contact Us</a>-->
+      </nav>
+      <div class="contact">
+        <span>Phone: 0425 123 456</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner -->
+  <section class="banner">
+    <div class="banner-slider">
+      <img src="banner-p1.jpg" class="slide active" alt="Banner 1">
+      <img src="banner-p2.jpg" class="slide" alt="Banner 2">
+      <img src="banner-p3.jpg" class="slide" alt="Banner 3">
+      <div class="banner-dots">
+        <span class="dot active" onclick="goToSlide(0)"></span>
+        <span class="dot" onclick="goToSlide(1)"></span>
+        <span class="dot" onclick="goToSlide(2)"></span>
+      </div>
+      <div class="banner-content">
+        <h1>We Take Care of <br>YOUR HOME!</h1>
+      </div>
+    </div>
+  </section>
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    let timer = null;
+
+    function showSlide(idx) {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === idx);
+      });
+      dots.forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
+      });
+      current = idx;
+    }
+    function changeSlide(dir) {
+      let idx = (current + dir + slides.length) % slides.length;
+      showSlide(idx);
+      resetTimer();
+    }
+    function goToSlide(idx) {
+      showSlide(idx);
+      resetTimer();
+    }
+    function resetTimer() {
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => changeSlide(1), 3500);
+    }
+    resetTimer();
+  </script>
+
+  <!-- About Us -->
+  <section class="about container">
+    <div class="about-text">
+      <h2>ABOUT US</h2>
+      <p>Welcome to <b>* Painting</b>, Melbourne’s trusted experts in <b>professional painting</b> and <b>property enhancement</b>. With over a decade of industry experience and more than <b>1,000 projects</b> successfully delivered, we take pride in providing <b>reliable, high-quality solutions</b> for <b>residential, commercial, and industrial clients</b>.<br>
+
+      At <b>* Painting</b>, we’re more than painters—we’re <b>craftsmen</b> dedicated to protecting and transforming your property with <b>precision and care</b>. Our team offers a comprehensive range of services, including <b>interior and exterior painting</b>, <b>render and plaster repairs</b>, <b>epoxy flooring</b>, <b>caulking</b>, <b>bricklaying</b>, and <b>concrete landscaping</b>.<br>
+
+      Every project we take on is guided by our core values: <b>quality</b>, <b>professionalism</b>, and <b>customer satisfaction</b>. Using <b>premium materials</b> and the <b>latest techniques</b>, we tailor each job to meet your specific needs, ensuring your project is completed <b>on time and within budget</b>. Whether you’re renovating your home, updating your office, or restoring your property, <b>* Painting delivers exceptional results you can trust</b>.<br>
+
+      Discover the <b>* Painting difference</b>—where <b>dependable service</b> meets <b>outstanding workmanship</b>.</p>
+    </div>
+    <div class="about-form">
+      <h2>GET YOUR FREE PAINTING QUOTE TODAY!</h2>
+      <p>Complete the form below, and our friendly team will be in touch soon with a personalised, no-obligation quote. Quick, reliable, and hassle-free!</p>
+      <form action="/" method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="tel" name="phone" placeholder="Phone Number" required>
+        <input type="email" name="email" placeholder="Email Address" required>
+        <input type="text" name="address" placeholder="Service Address" required>
+        <textarea name="message" placeholder="Your Message" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Service Call -->
+  <section class="call">
+    <div class="call-content">
+      <h3>Your Home Problems, Solved with One Call</h3>
+      <div class="call-number">0425 123 456</div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="services container">
+    <h2>Our Services</h2>
+    <p>We provide a complete range of professional painting and maintenance services across Melbourne. Our experienced team delivers exceptional quality and lasting results. Discover our full suite of services and experience outstanding craftsmanship.</p>
+    <div class="service-list">
+      <div class="service-item">
+        <img src="service1.jpg" alt="Residential Painting" class="service-img">
+        <div class="service-desc">Residential Painting</div>
+      </div>
+      <div class="service-item">
+        <img src="service2.jpg" alt="Commercial Painting" class="service-img">
+        <div class="service-desc">Commercial Painting</div>
+      </div>
+      <div class="service-item">
+        <img src="service3.jpg" alt="Exterior Repainting" class="service-img">
+        <div class="service-desc">Exterior Repainting</div>
+      </div>
+      <div class="service-item">
+        <img src="service4.jpg" alt="Roof Repainting" class="service-img">
+        <div class="service-desc">Roof Repainting</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <p>Our process is built to give you a smooth, hassle-free experience. Simply start by booking online, and our team will reach out to discuss your project needs in detail. We’ll then provide a clear, comprehensive quote. Once you’re ready to proceed, our team will handle the project with care, keeping you informed at every stage until everything is completed to your satisfaction.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="step-icon"><img src="icon-step1.png" alt="Online Booking"></span>
+        <div class="step-desc">Online Booking</div>
+      </div>
+      <span class="step-arrow-wrap"><img src="icon-arrow.png" alt="arrow" class="step-arrow"></span>
+      <div class="step">
+        <span class="step-icon"><img src="icon-step2.png" alt="Requirement Communication"></span>
+        <div class="step-desc">Requirement Communication</div>
+      </div>
+      <span class="step-arrow-wrap"><img src="icon-arrow.png" alt="arrow" class="step-arrow"></span>
+      <div class="step">
+        <span class="step-icon"><img src="icon-step3.png" alt="Quote Confirmation"></span>
+        <div class="step-desc">Quote Confirmation</div>
+      </div>
+      <span class="step-arrow-wrap"><img src="icon-arrow.png" alt="arrow" class="step-arrow"></span>
+      <div class="step">
+        <span class="step-icon"><img src="icon-step4.png" alt="Project Delivery"></span>
+        <div class="step-desc">Project Delivery</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="custom-footer">
+    <div class="footer-col hours">
+      <h3>OPENING <span>HOURS</span></h3>
+      <ul>
+        <li>Monday &nbsp; - 9:00AM to 6:00PM</li>
+        <li>Tuesday &nbsp; - 9:00AM to 6:00PM</li>
+        <li>Wednesday &nbsp; - 9:00AM to 6:00PM</li>
+        <li>Thursday &nbsp; - 9:00AM to 6:00PM</li>
+        <li>Friday &nbsp; - 9:00AM to 6:00PM</li>
+        <li>Saturday &nbsp; - 9:00AM to 6:00PM</li>
+      </ul>
+    </div>
+    <div class="footer-col contact">
+      <h3>CONTACT <span>HERE</span></h3>
+      <ul>
+        <li>Phone: <a href="#">+61 425 123 456</a></li>
+        <li>Email: <a href="mailto:info@psdpainting.com.au">info@painting.com.au</a></li>
+      </ul>
+    </div>
+    <div class="footer-copyright">
+      © 2025 Painting. All rights reserved.
+    </div>
+  </footer>
+</body>
+</html>
