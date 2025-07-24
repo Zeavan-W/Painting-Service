@@ -596,6 +596,25 @@ h3 {
   background: #6e9bfc;
 }
 @media (max-width: 600px) {
+  .container,
+  .about.container,
+  .services.container,
+  .how-it-works,
+  .custom-footer {
+    width: 100%;
+    max-width: 100vw;
+    padding-left: 38px;
+    padding-right: 38px;
+    box-sizing: border-box;
+  }
+  .about-form {
+    width: 100%;
+    min-width: 0;
+  }
+  .about-text {
+    width: 100%;
+    min-width: 0;
+  }
   .banner {
     height: 220px;
   }
