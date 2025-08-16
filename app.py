@@ -48,10 +48,19 @@ def index():
     # 直接返回 index.html 文件
     return send_from_directory('.', 'index.html')
 
-@app.route('/<path:filename>')
+# 静态文件路由 - 只处理特定文件类型
+@app.route('/style.css')
+def css_file():
+    return send_from_directory('.', 'style.css')
+
+@app.route('/<filename>')
 def static_files(filename):
-    """处理静态文件请求"""
-    return send_from_directory('.', filename)
+    """处理其他静态文件请求，只允许 GET 方法"""
+    # 检查文件是否存在
+    if os.path.exists(filename):
+        return send_from_directory('.', filename)
+    else:
+        return "文件不存在", 404
 
 if __name__ == '__main__':
     app.run(debug=False) 
