@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrueFinish Painting - Your Home Expert</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicon.jpg">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,6 +41,7 @@
       </div>
       <div class="banner-content">
         <h1>We Take Care of <br>YOUR HOME!</h1>
+        <button class="contact-btn" onclick="scrollToForm()">Contact Us</button>
       </div>
     </div>
   </section>
@@ -69,6 +74,14 @@
       timer = setInterval(() => changeSlide(1), 3500);
     }
     resetTimer();
+  </script>
+
+  <script>
+    function scrollToForm() {
+      document.querySelector('.about-form').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
   </script>
 
   <!-- About Us -->
