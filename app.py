@@ -48,5 +48,10 @@ def index():
     # 直接返回 index.html 文件
     return send_from_directory('.', 'index.html')
 
+@app.route('/<path:filename>')
+def static_files(filename):
+    """处理静态文件请求"""
+    return send_from_directory('.', filename)
+
 if __name__ == '__main__':
     app.run(debug=False) 
