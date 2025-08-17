@@ -91,13 +91,26 @@
       const form = document.getElementById('contactForm');
       const formData = new FormData(form);
       
-      // 显示提交状态
+      // Validate form fields
+      const name = formData.get('name').trim();
+      const phone = formData.get('phone').trim();
+      const email = formData.get('email').trim();
+      const address = formData.get('address').trim();
+      const message = formData.get('message').trim();
+      
+      // Check if any field is empty
+      if (!name || !phone || !email || !address || !message) {
+        showMessage('Please fill in all required fields.', 'error');
+        return;
+      }
+      
+      // Show submission status
       const submitBtn = form.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
       submitBtn.textContent = 'Sending...';
       submitBtn.disabled = true;
       
-      // 使用 Formspree 服务处理表单
+      // Use Formspree service to handle form submission
       fetch('https://formspree.io/f/xgvzbken', {
         method: 'POST',
         body: formData,
@@ -107,7 +120,7 @@
       })
       .then(response => {
         if (response.ok) {
-          showMessage('Thank you! Your message has been sent successfully.', 'success');
+          showSuccessModal();
           form.reset();
         } else {
           showMessage('Sorry, there was an error sending your message. Please try again.', 'error');
@@ -124,27 +137,52 @@
     }
     
     function showMessage(message, type) {
-      // 移除之前的消息
+      // Remove previous message
       const existingMessage = document.querySelector('.form-message');
       if (existingMessage) {
         existingMessage.remove();
       }
       
-      // 创建新消息
+      // Create new message
       const messageDiv = document.createElement('div');
       messageDiv.className = `form-message ${type}`;
       messageDiv.textContent = message;
       
-      // 插入到表单前
+      // Insert before form
       const form = document.getElementById('contactForm');
       form.parentNode.insertBefore(messageDiv, form);
       
-      // 3秒后自动移除消息
+      // Auto remove message after 3 seconds
       setTimeout(() => {
         if (messageDiv.parentNode) {
           messageDiv.remove();
         }
       }, 3000);
+    }
+    
+    function showSuccessModal() {
+      const modal = document.getElementById('successModal');
+      modal.style.display = 'flex';
+      
+      // Add animation class after a small delay
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
+      
+      // Auto hide after 4 seconds
+      setTimeout(() => {
+        hideSuccessModal();
+      }, 4000);
+    }
+    
+    function hideSuccessModal() {
+      const modal = document.getElementById('successModal');
+      modal.classList.remove('show');
+      
+      // Hide modal after animation completes
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
     }
   </script>
 
@@ -256,5 +294,15 @@
       © 2025 TrueFinish Painting. All rights reserved.
     </div>
   </footer>
+  
+  <!-- Success Modal -->
+  <div id="successModal" class="success-modal">
+    <div class="success-content">
+      <div class="success-icon">🎉</div>
+      <h3>Congratulations!</h3>
+      <p>Your message has been sent successfully!</p>
+      <p class="success-subtitle">We'll get back to you soon.</p>
+    </div>
+  </div>
 </body>
 </html>
