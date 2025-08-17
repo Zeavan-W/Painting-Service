@@ -84,6 +84,70 @@
     }
   </script>
 
+  <script>
+    function submitForm(event) {
+      event.preventDefault();
+      
+      const form = document.getElementById('contactForm');
+      const formData = new FormData(form);
+      
+      // 显示提交状态
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+      
+      // 使用 Formspree 服务处理表单
+      fetch('https://formspree.io/f/xgvzbken', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          showMessage('Thank you! Your message has been sent successfully.', 'success');
+          form.reset();
+        } else {
+          showMessage('Sorry, there was an error sending your message. Please try again.', 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showMessage('Sorry, there was an error sending your message. Please try again.', 'error');
+      })
+      .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+    }
+    
+    function showMessage(message, type) {
+      // 移除之前的消息
+      const existingMessage = document.querySelector('.form-message');
+      if (existingMessage) {
+        existingMessage.remove();
+      }
+      
+      // 创建新消息
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `form-message ${type}`;
+      messageDiv.textContent = message;
+      
+      // 插入到表单前
+      const form = document.getElementById('contactForm');
+      form.parentNode.insertBefore(messageDiv, form);
+      
+      // 3秒后自动移除消息
+      setTimeout(() => {
+        if (messageDiv.parentNode) {
+          messageDiv.remove();
+        }
+      }, 3000);
+    }
+  </script>
+
   <!-- About Us -->
   <section class="about container">
     <div class="about-text">
@@ -99,7 +163,7 @@
     <div class="about-form">
       <h2>GET YOUR FREE PAINTING QUOTE TODAY!</h2>
       <p>Complete the form below, and our friendly team will be in touch soon with a personalised, no-obligation quote. Quick, reliable, and hassle-free!</p>
-      <form action="/" method="POST">
+      <form id="contactForm" onsubmit="submitForm(event)">
         <input type="text" name="name" placeholder="Your Name" required>
         <input type="tel" name="phone" placeholder="Phone Number" required>
         <input type="email" name="email" placeholder="Email Address" required>
