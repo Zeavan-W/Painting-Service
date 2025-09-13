@@ -238,6 +238,219 @@
   </script>
 
   <script>
+    // Case studies video modal logic
+    function getModal(){ return document.getElementById('videoModal'); }
+    function ensureModal(){
+      let m = getModal();
+      if (!m) {
+        // 动态创建弹窗结构
+        m = document.createElement('div');
+        m.id = 'videoModal';
+        m.className = 'video-modal';
+        m.setAttribute('aria-hidden','true');
+        m.setAttribute('role','dialog');
+        const wrap = document.createElement('div');
+        wrap.className = 'video-wrap';
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'video-close';
+        closeBtn.setAttribute('aria-label','Close');
+        closeBtn.textContent = '✕';
+        closeBtn.onclick = closeVideo;
+        const container = document.createElement('div');
+        container.id = 'playerContainer';
+        const v = document.createElement('video');
+        v.id = 'caseVideo';
+        v.setAttribute('controls','');
+        v.setAttribute('playsinline','');
+        v.setAttribute('preload','metadata');
+        container.appendChild(v);
+        wrap.appendChild(closeBtn);
+        wrap.appendChild(container);
+        m.appendChild(wrap);
+        document.body.appendChild(m);
+      }
+      return m;
+    }
+
+    function getPlayerContainer(){ return document.getElementById('playerContainer'); }
+    function getVideoEl(){ return document.getElementById('caseVideo'); }
+    function ensureVideoEl(){
+      let v = getVideoEl();
+      if (!v) {
+        const c = getPlayerContainer();
+        if (!c) return null;
+        v = document.createElement('video');
+        v.id = 'caseVideo';
+        v.setAttribute('controls','');
+        v.setAttribute('playsinline','');
+        v.setAttribute('preload','metadata');
+        c.appendChild(v);
+      }
+      return v;
+    }
+
+    function log(...args){ try{ console.log('[case]', ...args); }catch(e){} }
+    log('script loaded');
+
+    function bindCaseClicks() {
+      const items = document.querySelectorAll('.case-item');
+      log('bind now count:', items.length);
+      items.forEach(function(item){
+        if (!item.__caseBound) {
+          item.__caseBound = true;
+          item.addEventListener('click', function(ev){
+            ev.preventDefault();
+            ev.stopPropagation();
+            const src = item.getAttribute('data-video');
+            log('click item ->', src);
+            if (src) openVideo(src);
+          });
+          const img = item.querySelector('img');
+          if (img){
+            img.style.pointerEvents = 'auto';
+            img.addEventListener('click', function(ev){
+              ev.preventDefault();
+              ev.stopPropagation();
+              const src = item.getAttribute('data-video');
+              log('click img ->', src);
+              if (src) openVideo(src);
+            });
+          }
+        }
+      });
+    }
+
+    bindCaseClicks();
+    document.addEventListener('DOMContentLoaded', bindCaseClicks);
+
+    document.addEventListener('click', function(e) {
+      const item = e.target.closest('.case-item');
+      if (item) {
+        const src = item.getAttribute('data-video');
+        log('delegate click ->', src);
+        if (src) openVideo(src);
+      }
+      const m = getModal();
+      if (m && e.target === m) {
+        closeVideo();
+      }
+    }, true);
+
+    function notify(msg, type) {
+      if (typeof showMessage === 'function') {
+        showMessage(msg, type || 'error');
+      } else {
+        alert(msg);
+      }
+    }
+
+    function isYouTube(url) {
+      return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+    }
+
+    function toYouTubeEmbed(url) {
+      try {
+        const u = new URL(url);
+        if (u.hostname.includes('youtu.be')) {
+          return `https://www.youtube.com/embed/${u.pathname.slice(1)}?autoplay=1&rel=0`;
+        }
+        const id = u.searchParams.get('v');
+        if (id) return `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+        if (u.pathname.startsWith('/embed/')) return `${u.origin}${u.pathname}?autoplay=1&rel=0`;
+      } catch(e) {}
+      return null;
+    }
+
+    function openVideo(src) {
+      const normalizedSrc = (src || '').trim();
+      if (!normalizedSrc) {
+        notify('Video source is missing.', 'error');
+        return;
+      }
+      log('openVideo:', normalizedSrc);
+
+      // Reset both players
+      cleanupPlayers();
+
+      if (isYouTube(normalizedSrc)) {
+        const embed = toYouTubeEmbed(normalizedSrc);
+        if (!embed) {
+          notify('Invalid YouTube URL.', 'error');
+          return;
+        }
+        const iframe = document.createElement('iframe');
+        iframe.width = '100%';
+        iframe.height = '520';
+        iframe.src = embed;
+        iframe.title = 'YouTube video player';
+        iframe.frameBorder = '0';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        ensureModal();
+        getPlayerContainer().appendChild(iframe);
+        const m = ensureModal();
+        m.classList.add('show');
+        m.setAttribute('aria-hidden', 'false');
+        log('iframe shown');
+        return;
+      }
+
+      // Fallback to native video (mp4/local)
+      const videoSrc = encodeURI(normalizedSrc);
+      const videoEl = ensureVideoEl();
+      if (!videoEl){ notify('Video container not found.', 'error'); return; }
+      const onError = () => {
+        videoEl.removeEventListener('error', onError);
+        videoEl.removeEventListener('canplay', onCanPlay);
+        notify(`Failed to load video: ${videoSrc}. Please check file path/name and case.`, 'error');
+        log('video error:', videoSrc);
+      };
+      const onCanPlay = () => {
+        videoEl.removeEventListener('error', onError);
+        videoEl.removeEventListener('canplay', onCanPlay);
+        log('video canplay:', videoSrc);
+        videoEl.play().catch(() => {});
+      };
+      videoEl.addEventListener('error', onError, { once: true });
+      videoEl.addEventListener('canplay', onCanPlay, { once: true });
+
+      videoEl.setAttribute('src', videoSrc);
+      videoEl.load();
+      const m = ensureModal();
+      m.classList.add('show');
+      m.setAttribute('aria-hidden', 'false');
+      log('video shown');
+    }
+
+    function cleanupPlayers() {
+      const container = getPlayerContainer();
+      const oldIframe = container ? container.querySelector('iframe') : null;
+      if (oldIframe) {
+        oldIframe.src = '';
+        oldIframe.remove();
+        log('cleanup iframe');
+      }
+      const v = getVideoEl();
+      if (v) {
+        v.pause();
+        v.removeAttribute('src');
+        try{ v.load(); }catch(e){}
+        log('cleanup video');
+      }
+    }
+
+    function closeVideo() {
+      cleanupPlayers();
+      const m = getModal();
+      if (m){
+        m.classList.remove('show');
+        m.setAttribute('aria-hidden', 'true');
+      }
+      log('modal closed');
+    }
+  </script>
+
+  <script>
     function submitForm(event) {
       event.preventDefault();
       
@@ -423,6 +636,69 @@
       </div>
     </div>
   </section>
+
+  <!-- Case Studies -->
+  <section class="case-studies">
+    <div class="container">
+      <h2>Recent Projects</h2>
+      <p class="case-intro">Discover our recently completed projects, featuring a wide variety of work across different industries. From initial idea to final delivery, we are dedicated to providing top-quality outcomes customized to each client’s goals. Every project highlights our focus on innovation, excellence, and customer satisfaction.</p>
+      <div class="case-grid">
+        <div class="case-item" data-video="case/case1.mp4">
+          <img class="case-thumb" src="case/case1.JPG" alt="Case Study 1">
+          <div class="play-icon">▶</div>
+          
+        </div>
+        <div class="case-item" data-video="case/case2.mp4">
+          <img class="case-thumb" src="case/case2.JPG" alt="Case Study 2">
+          <div class="play-icon">▶</div>
+          
+        </div>
+        <div class="case-item" data-video="case/case3.mp4">
+          <img class="case-thumb" src="case/case3.JPG" alt="Case Study 3">
+          <div class="play-icon">▶</div>
+          
+        </div>
+        <div class="case-item" data-video="case/case4.mp4">
+          <img class="case-thumb" src="case/case4.JPG" alt="Case Study 4">
+          <div class="play-icon">▶</div>
+          
+        </div>
+      </div>
+      <p></p>
+      <div class="case-grid">
+        <div class="case-item" data-video="case/case5.mp4">
+          <img class="case-thumb" src="case/case5.JPG" alt="Case Study 1">
+          <div class="play-icon">▶</div>
+          
+        </div>
+        <div class="case-item" data-video="case/case6.mp4">
+          <img class="case-thumb" src="case/case6.JPG" alt="Case Study 2">
+          <div class="play-icon">▶</div>
+          
+        </div>
+        <div class="case-item" data-video="case/case7.mp4">
+          <img class="case-thumb" src="case/case7.JPG" alt="Case Study 3">
+          <div class="play-icon">▶</div>
+          
+        </div>
+        <div class="case-item" data-video="case/case8.mp4">
+          <img class="case-thumb" src="case/case8.JPG" alt="Case Study 4">
+          <div class="play-icon">▶</div>
+          
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Video Modal -->
+  <div id="videoModal" class="video-modal" aria-hidden="true" role="dialog">
+    <div class="video-wrap">
+      <button class="video-close" aria-label="Close" onclick="closeVideo()">✕</button>
+      <div id="playerContainer">
+        <video id="caseVideo" controls playsinline preload="metadata"></video>
+      </div>
+    </div>
+  </div>
 
   <footer class="custom-footer">
     <div class="footer-col hours">
